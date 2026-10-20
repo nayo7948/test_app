@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
+import { Logo } from "./Logo";
 
 export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   const router = useRouter();
@@ -27,10 +28,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col justify-center px-6">
-      <h1 className="mb-1 text-3xl font-bold text-brand">우리동네</h1>
+    <main className="flex min-h-dvh flex-col justify-center bg-gradient-to-b from-brand-soft to-background px-6">
+      <h1 className="mb-2 flex items-center gap-3 text-3xl font-bold text-brand">
+        <Logo size={48} className="shrink-0 drop-shadow-sm" />
+        우리동네
+      </h1>
       <p className="mb-8 text-muted">내 근처 이웃과 나누는 동네 이야기</p>
-      <form onSubmit={onSubmit} className="space-y-3">
+      <form onSubmit={onSubmit} className="space-y-3 rounded-2xl bg-background p-5 shadow-sm ring-1 ring-border">
         {isSignup && <input name="nickname" placeholder="닉네임" className="input" required />}
         <input name="email" type="email" placeholder="이메일" className="input" required autoComplete="email" />
         <input
