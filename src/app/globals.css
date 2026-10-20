@@ -8,7 +8,6 @@
   --border: #eaebee;
   --brand: #ff6f0f;
   --brand-strong: #e85d00;
-  --brand-soft: #fff1e6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +19,6 @@
     --border: #2f3035;
     --brand: #ff7e2e;
     --brand-strong: #ff9552;
-    --brand-soft: #2b1d13;
   }
 }
 
@@ -32,7 +30,6 @@
   --color-border: var(--border);
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
-  --color-brand-soft: var(--brand-soft);
 }
 
 body {
