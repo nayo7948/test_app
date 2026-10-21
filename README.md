@@ -7,6 +7,7 @@
 - 동네 설정: 브라우저 위치(geolocation)로 좌표를 받고, 동네 이름과 반경(1/3/5/10km)을 고름
 - 동네생활 피드: 반경 안의 글만 최신순으로 표시, 카테고리 탭(동네질문·맛집·분실/실종·동네소식·일상), 더보기 페이지네이션
 - 글쓰기·삭제(작성자만), 댓글, 공감(좋아요), 조회수
+- 사진 첨부: 글 하나에 최대 5장(JPG·PNG·WebP·GIF). 브라우저에서 긴 변 1600px로 줄여 올리고, 서버는 파일 내용으로 형식을 다시 확인한 뒤 `uploads/`(`UPLOAD_DIR`)에 저장
 - 글에는 작성 시점의 동네 좌표가 저장되므로, 작성자가 동네를 옮겨도 글은 원래 동네에 남음
 - 반응형 화면: 휴대폰은 하단 탭바, PC는 상단 메뉴와 3단 피드(주제 · 글 목록 · 내 동네)
 
@@ -23,6 +24,8 @@ npm run dev                   # http://localhost:3000
 샘플 계정의 비밀번호는 모두 `password123`입니다: `yeoksam@example.com`(역삼동), `seocho@example.com`(서초동), `seongsu@example.com`(성수동), `haeundae@example.com`(부산 우동).
 
 > 브라우저 위치 권한은 `localhost`나 HTTPS에서만 동작합니다.
+
+> 새 버전을 받은 뒤(`git pull`)에는 `npm install`과 `npm run db:migrate`를 다시 실행해 DB 구조를 맞춰주세요.
 
 ## 스크립트
 | 명령 | 설명 |

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireLocatedUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { imageUrl } from "@/lib/uploads";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PostCard } from "@/components/PostCard";
 
@@ -9,7 +10,10 @@ export default async function MePage() {
   const posts = await db.post.findMany({
     where: { authorId: user.id },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { comments: true, likes: true } } },
+    include: {
+      _count: { select: { comments: true, likes: true, images: true } },
+      images: { orderBy: { position: "asc" }, take: 1 },
+    },
   });
 
   return (
@@ -38,7 +42,10 @@ export default async function MePage() {
         <h2 className="px-4 pt-4 pb-1 font-semibold">내가 쓴 글 {posts.length}</h2>
         {posts.length === 0 && <p className="px-4 py-10 text-center text-sm text-muted">아직 쓴 글이 없어요.</p>}
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <PostCard
+            key={post.id}
+            post={{ ...post, images: post.images.map((i) => ({ url: imageUrl(i.fileName), width: i.width, height: i.height })) }}
+          />
         ))}
       </section>
     </div>

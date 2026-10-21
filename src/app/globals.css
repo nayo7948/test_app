@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
-/* Keep the dev server from recompiling (and refreshing pages) whenever the SQLite DB is written. */
+/* Keep the dev server from recompiling (and refreshing pages) whenever the SQLite DB or uploads change. */
 @source not "../../prisma";
+@source not "../../uploads";
 
 :root {
   --background: #ffffff;
