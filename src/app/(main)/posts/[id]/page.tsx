@@ -16,7 +16,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   await db.post.update({ where: { id }, data: { viewCount: { increment: 1 } } });
 
   return (
-    <>
+    <div className="md:mx-auto md:mt-6 md:max-w-2xl md:overflow-hidden md:rounded-2xl md:border md:border-border">
       <header className="flex items-center justify-between border-b border-border px-4 py-3">
         <Link href="/" aria-label="뒤로">
           ←
@@ -44,6 +44,6 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         </div>
       </article>
       <CommentSection postId={post.id} initial={post.comments} />
-    </>
+    </div>
   );
 }
