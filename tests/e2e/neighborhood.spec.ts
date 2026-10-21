@@ -35,12 +35,21 @@ test("posts are shared with nearby neighbors only", async ({ browser }) => {
   await alice.getByLabel("주제").selectOption("QUESTION");
   await alice.getByPlaceholder("제목").fill(title);
   await alice.getByPlaceholder(/이웃과 이야기를 나눠보세요/).fill("조용한 곳이면 좋겠어요.");
+  // A large photo: the browser should shrink it to 1600px on the long side before upload.
+  await alice.getByLabel("사진 첨부").setInputFiles({ name: "cafe.png", mimeType: "image/png", buffer: await bigPng(alice) });
+  await expect(alice.getByAltText("첨부한 사진 1")).toBeVisible();
+  await expect(alice.getByRole("button", { name: /1\/5/ })).toBeVisible();
   await alice.getByRole("button", { name: "완료" }).click();
   await expect(alice.getByRole("heading", { name: title })).toBeVisible();
+  const photo = alice.getByAltText(`${title} 사진 1`);
+  await expect(photo).toHaveAttribute("width", "1600");
+  await expect(photo).toHaveAttribute("height", "1200");
+  expect(await photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBe(1600);
 
-  // Bob lives ~0.8km away: sees the post, comments and likes it.
+  // Bob lives ~0.8km away: sees the post (with its thumbnail), comments and likes it.
   const bob = await newResident(browser, "bob", GANGNAM, "역삼1동");
   await expect(bob.getByText(title)).toBeVisible();
+  await expect(bob.getByRole("link", { name: new RegExp(title) }).locator("img")).toBeVisible();
   await bob.getByText(title).click();
   await expect(bob).toHaveURL(/\/posts\//);
   await expect(bob.locator("article").getByText(/역삼동 · \d+m/)).toBeVisible();
@@ -70,3 +79,35 @@ test("logged-out visitors are sent to login", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/login/);
 });
+
+test("photos need a login and only real images are accepted", async ({ browser, request }) => {
+  expect((await request.get("/api/images/00000000-0000-0000-0000-000000000000.png")).status()).toBe(401);
+
+  const page = await newResident(browser, "dave", YEOKSAM, "역삼동");
+  const form = new FormData();
+  form.set("category", "FREE");
+  form.set("title", "가짜 사진");
+  form.set("content", "내용");
+  form.append("images", new Blob(["<script>alert(1)</script>"], { type: "image/png" }), "evil.png");
+  const res = await page.request.post("/api/posts", { multipart: form });
+  expect(res.status()).toBe(400);
+  expect((await res.json()).error).toContain("사진");
+  expect((await page.request.get("/api/images/..%2F..%2F.env")).status()).toBe(404);
+});
+
+/** A 2400x1800 PNG drawn in the browser (no binary fixtures in the repo). */
+async function bigPng(page: Page): Promise<Buffer> {
+  const dataUrl = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 2400;
+    canvas.height = 1800;
+    const ctx = canvas.getContext("2d")!;
+    const gradient = ctx.createLinearGradient(0, 0, 2400, 1800);
+    gradient.addColorStop(0, "#34d399");
+    gradient.addColorStop(1, "#ff6f0f");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 2400, 1800);
+    return canvas.toDataURL("image/png");
+  });
+  return Buffer.from(dataUrl.split(",")[1], "base64");
+}

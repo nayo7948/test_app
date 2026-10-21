@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireLocatedUser } from "@/lib/auth";
@@ -38,6 +39,21 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
         </div>
         <h1 className="mt-4 text-xl font-bold">{post.title}</h1>
         <p className="mt-3 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+        {post.images.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {post.images.map((image, i) => (
+              <Image
+                key={image.url}
+                src={image.url}
+                alt={`${post.title} 사진 ${i + 1}`}
+                width={image.width}
+                height={image.height}
+                unoptimized
+                className="h-auto max-h-[80vh] w-full rounded-xl bg-surface object-contain"
+              />
+            ))}
+          </div>
+        )}
         <div className="mt-6 flex items-center justify-between">
           <LikeButton postId={post.id} liked={post.likedByMe} count={post._count.likes} />
           <span className="text-xs text-muted">조회 {post.viewCount + 1}</span>

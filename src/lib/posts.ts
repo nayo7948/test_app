@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "./db";
 import { boundingBox, haversineKm, type LatLng } from "./geo";
+import { imageUrl } from "./uploads";
 import type { Category } from "./validators";
 
 export const FEED_PAGE_SIZE = 20;
@@ -17,11 +18,18 @@ const postListSelect = {
   viewCount: true,
   createdAt: true,
   author: { select: { id: true, nickname: true } },
-  _count: { select: { comments: true, likes: true } },
+  _count: { select: { comments: true, likes: true, images: true } },
+  // Feed cards only show the first photo as a thumbnail.
+  images: { orderBy: { position: "asc" }, take: 1, select: { fileName: true, width: true, height: true } },
 } satisfies Prisma.PostSelect;
 
 type PostRow = Prisma.PostGetPayload<{ select: typeof postListSelect }>;
-export type FeedPost = PostRow & { distanceKm: number };
+export type PostImageView = { url: string; width: number; height: number };
+export type FeedPost = Omit<PostRow, "images"> & { distanceKm: number; images: PostImageView[] };
+
+function toImageViews(images: { fileName: string; width: number; height: number }[]): PostImageView[] {
+  return images.map(({ fileName, width, height }) => ({ url: imageUrl(fileName), width, height }));
+}
 
 export type FeedCursor = { createdAt: string; id: string };
 
@@ -80,7 +88,7 @@ export async function getNearbyPosts(opts: {
 
     for (const post of batch) {
       const distanceKm = haversineKm(center, post);
-      if (distanceKm <= radiusKm) results.push({ ...post, distanceKm });
+      if (distanceKm <= radiusKm) results.push({ ...post, distanceKm, images: toImageViews(post.images) });
     }
     if (batch.length < BATCH_SIZE) break;
     const last = batch[batch.length - 1];
@@ -102,11 +110,12 @@ export async function getPostDetail(id: string, viewerId: string) {
         select: { id: true, content: true, createdAt: true, author: { select: { id: true, nickname: true } } },
       },
       likes: { where: { userId: viewerId }, select: { userId: true } },
+      images: { orderBy: { position: "asc" }, select: { fileName: true, width: true, height: true } },
     },
   });
   if (!post) return null;
-  const { likes, ...rest } = post;
-  return { ...rest, likedByMe: likes.length > 0 };
+  const { likes, images, ...rest } = post;
+  return { ...rest, images: toImageViews(images), likedByMe: likes.length > 0 };
 }
 
 /** Toggle the viewer's like; returns the new state and count. */

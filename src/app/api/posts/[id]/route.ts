@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUser, jsonError } from "@/lib/auth";
 import { getPostDetail } from "@/lib/posts";
+import { deleteImages } from "@/lib/uploads";
 import { firstError, postSchema } from "@/lib/validators";
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -40,6 +41,8 @@ export async function DELETE(_req: Request, { params }: Ctx) {
   const { error } = await loadOwnPost(id);
   if (error) return error;
 
+  const images = await db.postImage.findMany({ where: { postId: id }, select: { fileName: true } });
   await db.post.delete({ where: { id } });
+  await deleteImages(images.map((i) => i.fileName));
   return NextResponse.json({ ok: true });
 }

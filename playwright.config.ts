@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
-const env = { DATABASE_URL: "file:./e2e.db" };
+const env = { DATABASE_URL: "file:./e2e.db", UPLOAD_DIR: "uploads-e2e" };
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -14,7 +14,7 @@ export default defineConfig({
   ],
   webServer: {
     // Throwaway database, then a production build of the app.
-    command: `rm -f prisma/e2e.db && prisma db push --skip-generate && next build && next start -p ${PORT}`,
+    command: `rm -rf prisma/e2e.db uploads-e2e && prisma db push --skip-generate && next build && next start -p ${PORT}`,
     url: `http://localhost:${PORT}/login`,
     env,
     timeout: 300_000,

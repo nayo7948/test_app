@@ -12,6 +12,9 @@ export const CATEGORIES = {
 export type Category = keyof typeof CATEGORIES;
 export const CATEGORY_KEYS = Object.keys(CATEGORIES) as [Category, ...Category[]];
 
+/** Shared by the post form and the upload handler. */
+export const MAX_IMAGES_PER_POST = 5;
+
 export const signupSchema = z.object({
   email: z.email("올바른 이메일을 입력해주세요."),
   password: z.string().min(8, "비밀번호는 8자 이상이어야 해요."),
