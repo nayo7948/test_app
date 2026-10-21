@@ -8,6 +8,7 @@
 - 동네생활 피드: 반경 안의 글만 최신순으로 표시, 카테고리 탭(동네질문·맛집·분실/실종·동네소식·일상), 더보기 페이지네이션
 - 글쓰기·삭제(작성자만), 댓글, 공감(좋아요), 조회수
 - 글에는 작성 시점의 동네 좌표가 저장되므로, 작성자가 동네를 옮겨도 글은 원래 동네에 남음
+- 반응형 화면: 휴대폰은 하단 탭바, PC는 상단 메뉴와 3단 피드(주제 · 글 목록 · 내 동네)
 
 ## 기술 스택
 Next.js 15 (App Router) · TypeScript · Tailwind CSS 4 · Prisma 6 + SQLite · zod · jose · Vitest · Playwright
@@ -29,7 +30,7 @@ npm run dev                   # http://localhost:3000
 | `npm run dev` / `build` / `start` | 개발 서버 / 빌드 / 실행 |
 | `npm run lint` / `typecheck` | ESLint / TypeScript 검사 |
 | `npm test` | 단위 테스트 (거리 계산, 입력 검증, 반경 피드 페이지네이션) |
-| `npm run test:e2e` | Playwright E2E (별도 `prisma/e2e.db` 사용) |
+| `npm run test:e2e` | Playwright E2E, 휴대폰·PC 화면에서 각각 실행 (별도 `prisma/e2e.db` 사용) |
 | `npm run db:seed` | 샘플 데이터 다시 넣기 |
 
 ## 위치 기반 조회 방식
@@ -43,7 +44,7 @@ npm run dev                   # http://localhost:3000
 ## 구조
 ```
 prisma/            schema.prisma, migrations, seed.ts
-src/app/           페이지(피드, 글쓰기, 글 상세, 나의 동네, 동네 설정, 로그인/가입)와 API 라우트
+src/app/           (main): 로그인 후 화면(피드, 글쓰기, 글 상세, 나의 동네) · (auth): 로그인/가입 · api/: API 라우트
 src/components/    UI 컴포넌트
 src/lib/           auth, session, geo, posts, validators
 src/middleware.ts  로그인하지 않은 사용자를 /login으로 보냄

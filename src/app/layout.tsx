@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="antialiased">
-        <div className="mx-auto min-h-dvh max-w-md border-x border-border pb-20">{children}</div>
+        {children}
       </body>
     </html>
   );

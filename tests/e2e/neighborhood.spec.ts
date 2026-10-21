@@ -7,7 +7,9 @@ const BUSAN = { latitude: 35.1631, longitude: 129.1636 };
 const run = Date.now();
 
 async function newResident(browser: Browser, name: string, geolocation: typeof YEOKSAM, dong: string) {
-  const context = await browser.newContext({ geolocation, permissions: ["geolocation"], locale: "ko-KR" });
+  // Inherit the project's device/viewport (mobile or desktop) and baseURL.
+  const { baseURL, ...device } = test.info().project.use;
+  const context = await browser.newContext({ ...device, baseURL, geolocation, permissions: ["geolocation"], locale: "ko-KR" });
   const page = await context.newPage();
   await page.goto("/signup");
   await page.getByPlaceholder("닉네임").fill(name);
@@ -40,7 +42,8 @@ test("posts are shared with nearby neighbors only", async ({ browser }) => {
   const bob = await newResident(browser, "bob", GANGNAM, "역삼1동");
   await expect(bob.getByText(title)).toBeVisible();
   await bob.getByText(title).click();
-  await expect(bob.getByText(/역삼동 · \d+m/)).toBeVisible();
+  await expect(bob).toHaveURL(/\/posts\//);
+  await expect(bob.locator("article").getByText(/역삼동 · \d+m/)).toBeVisible();
   await bob.getByRole("button", { name: /공감 0/ }).click();
   await expect(bob.getByRole("button", { name: /공감 1/ })).toHaveAttribute("aria-pressed", "true");
   await bob.getByLabel("댓글").fill("저도 궁금해요!");

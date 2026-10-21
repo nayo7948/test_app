@@ -81,7 +81,7 @@ export function CommentSection({ postId, initial }: { postId: string; initial: C
           </li>
         ))}
       </ul>
-      <form onSubmit={onSubmit} className="fixed inset-x-0 bottom-0 mx-auto flex max-w-md gap-2 border-t border-x border-border bg-background p-3">
+      <form onSubmit={onSubmit} className="fixed inset-x-0 bottom-0 mx-auto flex max-w-md gap-2 border-x border-t border-border bg-background p-3 md:static md:max-w-none md:border-x-0">
         <input
           value={content}
           onChange={(e) => setContent(e.target.value)}
